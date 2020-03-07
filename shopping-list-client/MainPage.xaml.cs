@@ -7,8 +7,9 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
+using System.Globalization;
+using System.Threading;
 
 namespace shopping_list_client
 {
@@ -19,6 +20,8 @@ namespace shopping_list_client
         private static readonly HttpClient client = new HttpClient() { BaseAddress = url };
 
         private ObservableCollection<Item> items = new ObservableCollection<Item>();
+        private List<Item> serverItems = new List<Item>();
+        private bool threadStarted = false;
 
         public MainPage()
         {
@@ -27,6 +30,12 @@ namespace shopping_list_client
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             itemsListView.ItemsSource = items;
             GetItems();
+
+            foreach (Item item in items)
+            {
+                Item i = new Item(item);
+                serverItems.Add(i);
+            }
         }
 
         private void GetItems()
@@ -64,9 +73,9 @@ namespace shopping_list_client
         {
             var values = new Dictionary<string, string>
                 {
-                    { "id", item.Id.ToString() },
+                    { "id", item.Id.ToString("G", CultureInfo.CreateSpecificCulture("en-US")) },
                     {"name", item.Name },
-                    { "bought", item.Bought.ToString() }
+                    { "bought", item.Bought.ToString(CultureInfo.CreateSpecificCulture("en-US")) }
                 };
             var content = JsonConvert.SerializeObject(values);
 
@@ -79,6 +88,42 @@ namespace shopping_list_client
             client.SendAsync(requestMessage).Wait();
 
             requestMessage.Dispose();
+        }
+
+        private void UpdateItems()
+        {
+            Thread.Sleep(5000);
+
+            foreach(Item item in items)
+            {
+                foreach (Item serverItem in serverItems)
+                {
+                    if(item.Id == serverItem.Id)
+                    {
+                        if(item.Bought != serverItem.Bought)
+                        {
+                            var values = new Dictionary<string, string>
+                                {
+                                    { "id", item.Id.ToString("G", CultureInfo.CreateSpecificCulture("en-US")) },
+                                    {"name", item.Name },
+                                    { "bought", item.Bought.ToString(CultureInfo.CreateSpecificCulture("en-US")) }
+                                };
+                            var content = JsonConvert.SerializeObject(values);
+
+                            HttpRequestMessage requestMessage = new HttpRequestMessage
+                            {
+                                Content = new StringContent(content, Encoding.UTF8, "application/json"),
+                                Method = HttpMethod.Put,
+                                RequestUri = url
+                            };
+                            client.SendAsync(requestMessage).Wait();
+                            requestMessage.Dispose();
+                        }
+                        break;
+                    }
+                }
+            }
+            threadStarted = false;
         }
 
         private void AddButton_Clicked(object sender, EventArgs e)
@@ -105,6 +150,13 @@ namespace shopping_list_client
             else
             {
                 items.Move(items.IndexOf(t), 0);
+            }
+
+            if(!threadStarted)
+            {
+                threadStarted = true;
+                Thread updatethread = new Thread(new ThreadStart(UpdateItems));
+                updatethread.Start();
             }
         }
 

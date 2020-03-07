@@ -8,6 +8,17 @@ namespace shopping_list_client.Model
         public string Name { get; set; }
         public bool Bought { get; set; }
 
+        public Item(Item item)
+        {
+            Id = item.Id;
+            Name = item.Name;
+            Bought = item.Bought;
+        }
+
+        public Item()
+        {
+        }
+
         public int CompareTo(object obj)
         {
             Item item = obj as Item;
