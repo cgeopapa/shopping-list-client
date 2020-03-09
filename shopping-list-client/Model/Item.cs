@@ -30,11 +30,11 @@ namespace shopping_list_client.Model
             {
                 if (Bought)
                 {
-                    return -1;
+                    return 1;
                 }
                 else
                 {
-                    return 1;
+                    return -1;
                 }
             }
         }

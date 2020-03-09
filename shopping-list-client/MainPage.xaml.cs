@@ -28,8 +28,9 @@ namespace shopping_list_client
             InitializeComponent();
 
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            itemsListView.ItemsSource = items;
+            
             GetItems();
+            itemsListView.ItemsSource = items;
 
             foreach (Item item in items)
             {
@@ -42,31 +43,26 @@ namespace shopping_list_client
         {
             string response = client.GetAsync(url).Result.Content.ReadAsStringAsync().Result;
 
-            var itemsList = JsonConvert.DeserializeObject<List<Item>>(response);
-            itemsList.Sort();
-            foreach (Item item in itemsList)
-            {
-                items.Add(item);
-            }
+            items = JsonConvert.DeserializeObject<ObservableCollection<Item>>(response);
+            //var itemsList = JsonConvert.DeserializeObject<List<Item>>(response);
+            //itemsList.Sort();
+            //foreach (Item item in itemsList)
+            //{
+            //    items.Add(item);
+            //}
         }
 
-        private void AddItem()
+        private void AddItem(string item)
         {
-            string item = itemName.Text;
-            if (item == null || item.Length > 0)
-            {
-                var values = new Dictionary<string, string>
+            var values = new Dictionary<string, string>
                 {
                     {"name", item }
                 };
-                var content = new FormUrlEncodedContent(values);
-                var response = client.PostAsync(url, content).Result.Content.ReadAsStringAsync().Result;
-                content.Dispose();
+            var content = new FormUrlEncodedContent(values);
+            var response = client.PostAsync(url, content).Result.Content.ReadAsStringAsync().Result;
+            content.Dispose();
 
-                items.Add(JsonConvert.DeserializeObject<Item>(response));
-
-                itemName.Text = "";
-            }
+            items.Add(JsonConvert.DeserializeObject<Item>(response));
         }
 
         private void DeleteItem(Item item)
@@ -128,7 +124,12 @@ namespace shopping_list_client
 
         private void AddButton_Clicked(object sender, EventArgs e)
         {
-            AddItem();
+            string item = itemName.Text;
+            if (item != null && item.Length > 0)
+            {
+                AddItem(item);
+            }
+            itemName.Text = "";
         }
 
         private void bought_CheckedChanged(object sender, CheckedChangedEventArgs e)
@@ -162,13 +163,12 @@ namespace shopping_list_client
 
         private void ToolbarItem_Clicked(object sender, EventArgs e)
         {
-            List<Item> itemsList = new List<Item>(items);
-            foreach (Item item in itemsList)
+            for(int i = 0; i < items.Count; i++)
             {
+                Item item = items[i];
                 if(item.Bought)
                 {
-                    DeleteItem(item);
-
+                    //DeleteItem(item);
                     items.Remove(item);
                 }
             }
