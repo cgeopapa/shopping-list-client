@@ -24,7 +24,7 @@
                                         <Setter Property="TextDecorations" Value="Strikethrough"/>
                                         <Setter Property="FontAttributes" Value="Italic"/>
                                     </DataTrigger>
-                                </Label.Triggers>                                
+                                </Label.Triggers>
                             </Label>
                         </StackLayout>
                     </ViewCell>

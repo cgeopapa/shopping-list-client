@@ -135,42 +135,50 @@ namespace shopping_list_client
         private void bought_CheckedChanged(object sender, CheckedChangedEventArgs e)
         {
             Item t = (Item)((CheckBox)sender).BindingContext;
-            List<Item> tempList = new List<Item>(items);
-            foreach (Item item in tempList)
+            if (t != null)
             {
-                if (t.Bought == item.Bought && t.Name != item.Name)
+                List<Item> tempList = new List<Item>(items);
+                foreach (Item item in tempList)
                 {
-                    items.Move(items.IndexOf(t), items.IndexOf(item));
-                    return;
+                    if (t.Bought == item.Bought && t.Name != item.Name)
+                    {
+                        items.Move(items.IndexOf(t), items.IndexOf(item));
+                        return;
+                    }
                 }
-            }
-            if(t.Bought)
-            {
-                items.Move(items.IndexOf(t), items.Count-1);
-            }
-            else
-            {
-                items.Move(items.IndexOf(t), 0);
-            }
+                if (t.Bought)
+                {
+                    items.Move(items.IndexOf(t), items.Count - 1);
+                }
+                else
+                {
+                    items.Move(items.IndexOf(t), 0);
+                }
 
-            if(!threadStarted)
-            {
-                threadStarted = true;
-                Thread updatethread = new Thread(new ThreadStart(UpdateItems));
-                updatethread.Start();
+                if (!threadStarted)
+                {
+                    threadStarted = true;
+                    Thread updatethread = new Thread(new ThreadStart(UpdateItems));
+                    updatethread.Start();
+                }
             }
         }
 
         private void ToolbarItem_Clicked(object sender, EventArgs e)
         {
-            for(int i = 0; i < items.Count; i++)
+            var toRemove = new List<Item>();
+            foreach (var item in items)
             {
-                Item item = items[i];
                 if(item.Bought)
                 {
-                    //DeleteItem(item);
-                    items.Remove(item);
+                    toRemove.Add(item);
                 }
+            }
+
+            foreach (var dead in toRemove)
+            {
+                DeleteItem(dead);
+                items.Remove(dead);
             }
         }
     }
