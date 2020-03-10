@@ -65,14 +65,17 @@ namespace shopping_list_client
             items.Add(JsonConvert.DeserializeObject<Item>(response));
         }
 
-        private void DeleteItem(Item item)
+        private void DeleteItem(List<Item> itemList)
         {
-            var values = new Dictionary<string, string>
-                {
+            var values = new List<Dictionary<string, string>>();
+            foreach (Item item in itemList)
+            {
+                values.Add(new Dictionary<string, string>{
                     { "id", item.Id.ToString("G", CultureInfo.CreateSpecificCulture("en-US")) },
-                    {"name", item.Name },
+                    { "name", item.Name },
                     { "bought", item.Bought.ToString(CultureInfo.CreateSpecificCulture("en-US")) }
-                };
+                });
+            }
             var content = JsonConvert.SerializeObject(values);
 
             HttpRequestMessage requestMessage = new HttpRequestMessage
@@ -90,35 +93,26 @@ namespace shopping_list_client
         {
             Thread.Sleep(5000);
 
-            foreach(Item item in items)
+            var values = new List<Dictionary<string, string>>();
+            foreach (Item item in items)
             {
-                foreach (Item serverItem in serverItems)
+                values.Add(new Dictionary<string, string>
                 {
-                    if(item.Id == serverItem.Id)
-                    {
-                        if(item.Bought != serverItem.Bought)
-                        {
-                            var values = new Dictionary<string, string>
-                                {
-                                    { "id", item.Id.ToString("G", CultureInfo.CreateSpecificCulture("en-US")) },
-                                    {"name", item.Name },
-                                    { "bought", item.Bought.ToString(CultureInfo.CreateSpecificCulture("en-US")) }
-                                };
-                            var content = JsonConvert.SerializeObject(values);
-
-                            HttpRequestMessage requestMessage = new HttpRequestMessage
-                            {
-                                Content = new StringContent(content, Encoding.UTF8, "application/json"),
-                                Method = HttpMethod.Put,
-                                RequestUri = url
-                            };
-                            client.SendAsync(requestMessage).Wait();
-                            requestMessage.Dispose();
-                        }
-                        break;
-                    }
-                }
+                    { "id", item.Id.ToString("G", CultureInfo.CreateSpecificCulture("en-US")) },
+                    {"name", item.Name },
+                    { "bought", item.Bought.ToString(CultureInfo.CreateSpecificCulture("en-US")) }
+                });
             }
+            var content = JsonConvert.SerializeObject(values);
+            HttpRequestMessage requestMessage = new HttpRequestMessage
+            {
+                Content = new StringContent(content, Encoding.UTF8, "application/json"),
+                Method = HttpMethod.Put,
+                RequestUri = url
+            };
+            client.SendAsync(requestMessage).Wait();
+            requestMessage.Dispose();
+
             threadStarted = false;
         }
 
@@ -175,9 +169,9 @@ namespace shopping_list_client
                 }
             }
 
+            DeleteItem(toRemove);
             foreach (var dead in toRemove)
             {
-                DeleteItem(dead);
                 items.Remove(dead);
             }
         }
