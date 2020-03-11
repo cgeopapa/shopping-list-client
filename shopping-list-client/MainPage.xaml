@@ -17,7 +17,7 @@
                 <DataTemplate>
                     <ViewCell>
                         <StackLayout Orientation="Horizontal" Spacing="15">
-                            <CheckBox x:Name="bought" IsChecked="{Binding Bought}" CheckedChanged="bought_CheckedChanged"/>
+                            <CheckBox x:Name="bought" IsChecked="{Binding Bought}" CheckedChanged="Bought_CheckedChanged"/>
                             <Label Text="{Binding Name}" TextDecorations="None" VerticalOptions="Center" FontSize="Large" IsVisible="True">
                                 <Label.Triggers>
                                     <DataTrigger TargetType="Label" Binding="{Binding Source={x:Reference bought}, Path=IsChecked}" Value="True">
