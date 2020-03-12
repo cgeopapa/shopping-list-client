@@ -11,26 +11,27 @@
     </ContentPage.ToolbarItems>
 
     <StackLayout Orientation="Vertical">
-        <ListView x:Name="itemsListView" Margin="20, 0"
-                  HorizontalOptions="Fill" VerticalOptions="StartAndExpand" SelectionMode="None">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <ViewCell>
-                        <StackLayout Orientation="Horizontal" Spacing="15">
-                            <CheckBox x:Name="bought" IsChecked="{Binding Bought}" CheckedChanged="Bought_CheckedChanged"/>
-                            <Label Text="{Binding Name}" TextDecorations="None" VerticalOptions="Center" FontSize="Large" IsVisible="True">
-                                <Label.Triggers>
-                                    <DataTrigger TargetType="Label" Binding="{Binding Source={x:Reference bought}, Path=IsChecked}" Value="True">
-                                        <Setter Property="TextDecorations" Value="Strikethrough"/>
-                                        <Setter Property="FontAttributes" Value="Italic"/>
-                                    </DataTrigger>
-                                </Label.Triggers>
-                            </Label>
-                        </StackLayout>
-                    </ViewCell>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            <ListView x:Name="itemsListView" Margin="20, 0" 
+                      IsPullToRefreshEnabled="True" RefreshCommand="{Binding RefreshCommand}" IsRefreshing="{Binding IsRefreshing}"
+                      HorizontalOptions="Fill" VerticalOptions="StartAndExpand" SelectionMode="None">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Orientation="Horizontal" Spacing="15">
+                                <CheckBox x:Name="bought" IsChecked="{Binding Bought}" CheckedChanged="Bought_CheckedChanged"/>
+                                <Label Text="{Binding Name}" TextDecorations="None" VerticalOptions="Center" FontSize="Large" IsVisible="True">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Source={x:Reference bought}, Path=IsChecked}" Value="True">
+                                            <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                            <Setter Property="FontAttributes" Value="Italic"/>
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         <StackLayout Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="FillAndExpand">
             <Entry Placeholder="Να πάρουμε..." x:Name="itemName" HorizontalOptions="FillAndExpand"/>
             <Button Text="Προσθήκη" HorizontalOptions="End" Clicked="AddButton_Clicked"/>
