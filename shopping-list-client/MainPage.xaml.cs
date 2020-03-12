@@ -28,13 +28,14 @@ namespace shopping_list_client
         {
             InitializeComponent();
             BindingContext = this;
+
+            RefreshCommand = new Command(Refresh);
             itemsListView.RefreshCommand = RefreshCommand;
             itemsListView.IsRefreshing = IsRefreshing;
 
             restfulController = new RestfulController();
-            RefreshCommand = new Command(Refresh);
 
-            restfulController.items = restfulController.GetItems();
+            restfulController.GetItems();
             itemsListView.ItemsSource = restfulController.items;
         }
 

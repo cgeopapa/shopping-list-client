@@ -37,11 +37,11 @@ namespace shopping_list_client.Controller
             UpdateItems();
         }
 
-        public ObservableCollection<Item> GetItems()
+        public void GetItems()
         {
             string response = client.GetAsync(url).Result.Content.ReadAsStringAsync().Result;
 
-            return JsonConvert.DeserializeObject<ObservableCollection<Item>>(response);
+            items = JsonConvert.DeserializeObject<ObservableCollection<Item>>(response);
         }
 
         public void AddItem(string item)
