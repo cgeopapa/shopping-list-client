@@ -22,21 +22,22 @@ namespace shopping_list_client
                 OnPropertyChanged(nameof(IsRefreshing));
             }
         }
+        private int gotItems = 0;
+
         public ICommand RefreshCommand { get; }
 
         public MainPage()
         {
             InitializeComponent();
             BindingContext = this;
-
-            RefreshCommand = new Command(Refresh);
-            itemsListView.RefreshCommand = RefreshCommand;
-            itemsListView.IsRefreshing = IsRefreshing;
-
             restfulController = new RestfulController();
 
             restfulController.GetItems();
             itemsListView.ItemsSource = restfulController.items;
+            gotItems = restfulController.items.Count;
+
+            RefreshCommand = new Command(Refresh);
+            itemsListView.RefreshCommand = RefreshCommand;
         }
 
         private void AddButton_Clicked(object sender, EventArgs e)
@@ -51,10 +52,17 @@ namespace shopping_list_client
 
         private void Bought_CheckedChanged(object sender, CheckedChangedEventArgs e)
         {
-            Item t = (Item)((CheckBox)sender).BindingContext;
-            if (t != null)
+            if (gotItems == 0)
             {
-                restfulController.ItemBought(t);
+                Item t = (Item)((CheckBox)sender).BindingContext;
+                if (t != null)
+                {
+                    restfulController.ItemBought(t);
+                }
+            }
+            else
+            {
+                gotItems--;
             }
         }
 
@@ -70,6 +78,7 @@ namespace shopping_list_client
             itemsListView.ItemsSource = null;
             restfulController.GetItems();
             itemsListView.ItemsSource = restfulController.items;
+            gotItems = restfulController.items.Count;
 
             IsRefreshing = false;
         }

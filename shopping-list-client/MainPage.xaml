@@ -11,8 +11,7 @@
     </ContentPage.ToolbarItems>
 
     <StackLayout Orientation="Vertical">
-            <ListView x:Name="itemsListView" Margin="20, 0" 
-                      IsPullToRefreshEnabled="True" RefreshCommand="{Binding RefreshCommand}" IsRefreshing="{Binding IsRefreshing}"
+            <ListView x:Name="itemsListView" Margin="20, 0" IsPullToRefreshEnabled="True" IsRefreshing="{Binding IsRefreshing}" 
                       HorizontalOptions="Fill" VerticalOptions="StartAndExpand" SelectionMode="None">
                 <ListView.ItemTemplate>
                     <DataTemplate>

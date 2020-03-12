@@ -41,7 +41,9 @@ namespace shopping_list_client.Controller
         {
             string response = client.GetAsync(url).Result.Content.ReadAsStringAsync().Result;
 
-            items = JsonConvert.DeserializeObject<ObservableCollection<Item>>(response);
+            var toSort = JsonConvert.DeserializeObject<List<Item>>(response);
+            toSort.Sort();
+            items = new ObservableCollection<Item>(toSort);
         }
 
         public void AddItem(string item)
